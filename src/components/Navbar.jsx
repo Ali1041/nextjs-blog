@@ -1,44 +1,158 @@
-import React from 'react';
+'use client';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import React, { useState } from 'react';
+import logo from "@/assets/images/logo.png";
 
 const Navbar = () => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
     return (
-        <nav className="navbar navbar-expand-lg fixed-top bg-dark" data-bs-theme="dark">
-            <div className="container">
-                {/* Logo */}
-                <a className="navbar-brand" href="/">
-                    <img src="/assets/images/logo.png" alt="Ijaad Labs" width="165" />
-                </a>
-
-                {/* Navbar toggler button */}
-                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <div className="navbar-toggler-icon">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+        <nav className="fixed top-0 left-0 right-0 bg-slate-900 border-b border-slate-800 z-50">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between h-16 lg:h-20">
+                    {/* Logo */}
+                    <div className="flex-shrink-0">
+                        <Link href="/" className="flex items-center">
+                            <Image
+                                src={logo}
+                                alt="Ijaad Labs"
+                                className="h-8 w-auto lg:h-10"
+                                onError={(e) => {
+                                    e.target.style.display = 'none';
+                                    console.log('Logo failed to load');
+                                }}
+                            />
+                        </Link>
                     </div>
-                </button>
 
-                {/* Navbar content */}
-                <div className="collapse navbar-collapse show" id="navbarContent">
-                    <div className="navbar-content-inner ms-lg-auto d-flex flex-column flex-lg-row align-lg-center gap-4 gap-lg-10 p-2 p-lg-0">
-                        <ul className="navbar-nav gap-lg-2 gap-xl-5">
-                            <li className="nav-item">
-                                <a className="nav-link text-white" href="/">
-                                    Home
-                                </a>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link text-white" href="#about">About Us</a>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link text-white active" href="/contact">Contact</a>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link text-white" href="/blog">Blog</a>
-                            </li>
-                        </ul>
-                        <div className="">
-                            <a href="/contact" className="btn btn-outline-primary-dark">Get Started</a>
+                    {/* Desktop Navigation */}
+                    <div className="hidden lg:flex items-center space-x-8">
+                        <div className="flex items-center space-x-8">
+                            <Link
+                                href="/"
+                                className="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-all duration-200 no-underline"
+                                style={{ textDecoration: 'none' }}
+                            >
+                                Home
+                            </Link>
+                            <Link
+                                href="#about"
+                                className="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-all duration-200 no-underline"
+                                style={{ textDecoration: 'none' }}
+                            >
+                                About Us
+                            </Link>
+                            <Link
+                                href="/contact"
+                                className="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-all duration-200 no-underline"
+                                style={{ textDecoration: 'none' }}
+                            >
+                                Contact
+                            </Link>
+                            <Link
+                                href="/blog"
+                                className="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-all duration-200 no-underline"
+                                style={{ textDecoration: 'none' }}
+                            >
+                                Blog
+                            </Link>
+                            <Link
+                                href="/case-studies"
+                                className="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-all duration-200 no-underline"
+                                style={{ textDecoration: 'none' }}
+                            >
+                                Case Studies
+                            </Link>
+                        </div>
+                        <div>
+                            <Link
+                                href="/contact"
+                                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-full text-sm font-medium hover:from-purple-700 hover:to-pink-700 transition-all duration-200 transform hover:scale-105 no-underline"
+                                style={{ textDecoration: 'none' }}
+                            >
+                                Get Started
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/* Mobile menu button */}
+                    <div className="lg:hidden">
+                        <button
+                            onClick={toggleMenu}
+                            className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-yellow-400 transition-colors duration-200"
+                        >
+                            <span className="sr-only">Open main menu</span>
+                            {!isMenuOpen ? (
+                                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                            ) : (
+                                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            )}
+                        </button>
+                    </div>
+                </div>
+
+                {/* Mobile Navigation Menu */}
+                <div className={`lg:hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-96 opacity-100 pb-4' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+                    <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-slate-800 rounded-lg mt-2">
+                        <a
+                            href="/"
+                            className="text-gray-300 hover:text-yellow-400 block px-3 py-2 text-base font-medium transition-all duration-200 no-underline"
+                            style={{ textDecoration: 'none' }}
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            Home
+                        </a>
+                        <a
+                            href="#about"
+                            className="text-gray-300 hover:text-yellow-400 block px-3 py-2 text-base font-medium transition-all duration-200 no-underline"
+                            style={{ textDecoration: 'none' }}
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            About Us
+                        </a>
+                        <a
+                            href="/contact"
+                            className="text-gray-300 hover:text-yellow-400 block px-3 py-2 text-base font-medium transition-all duration-200 no-underline"
+                            style={{ textDecoration: 'none' }}
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            Contact
+                        </a>
+                        <a
+                            href="/blog"
+                            className="text-gray-300 hover:text-yellow-400 block px-3 py-2 text-base font-medium transition-all duration-200 no-underline"
+                            style={{ textDecoration: 'none' }}
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            Blog
+                        </a>
+                        <a
+                            href="/case-studies"
+                            className="text-gray-300 hover:text-yellow-400 block px-3 py-2 text-base font-medium transition-all duration-200 no-underline"
+                            style={{ textDecoration: 'none' }}
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            Case Studies
+                        </a>
+                        <div className="pt-4">
+                            <a
+                                href="/contact"
+                                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-full text-base font-medium hover:from-purple-700 hover:to-pink-700 transition-all duration-200 block text-center w-full no-underline"
+                                style={{ textDecoration: 'none' }}
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                Get Started
+                            </a>
                         </div>
                     </div>
                 </div>

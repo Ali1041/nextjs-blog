@@ -3,7 +3,7 @@
 const ITEMS_PER_PAGE = 6
 
 export async function getPosts(page = 1) {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/posts`)
+    const response = await fetch(`http://localhost:3000/api/posts`)
     const allPosts = await response.json()
 
     const start = (page - 1) * ITEMS_PER_PAGE
@@ -16,4 +16,3 @@ export async function getPosts(page = 1) {
         totalPages,
     }
 }
-
