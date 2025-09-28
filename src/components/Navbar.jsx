@@ -1,15 +1,46 @@
-'use client';
+"use client";
 
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from "@/assets/images/logo.png";
+import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [loadingAdmin, setLoadingAdmin] = useState(true);
+
+    useEffect(() => {
+        // Check admin status on component mount
+        const checkAdminStatus = async () => {
+            try {
+                const response = await fetch('/api/auth/check');
+                const data = await response.json();
+                setIsAdmin(data.isAdmin || false);
+            } catch (error) {
+                setIsAdmin(false);
+            } finally {
+                setLoadingAdmin(false);
+            }
+        };
+
+        checkAdminStatus();
+    }, []);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
+    };
+
+    const handleLogout = async () => {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            setIsAdmin(false);
+            // Refresh the page to update UI
+            window.location.reload();
+        } catch (error) {
+            console.error('Logout failed');
+        }
     };
 
     return (
@@ -70,7 +101,32 @@ const Navbar = () => {
                                 Case Studies
                             </Link>
                         </div>
-                        <div>
+                        <div className="flex items-center space-x-4">
+                            {!loadingAdmin && (
+                                <>
+                                    {isAdmin ? (
+                                        <div className="flex items-center space-x-3">
+                                            <span className="text-green-400 text-sm">Admin</span>
+                                            <Button
+                                                onClick={handleLogout}
+                                                variant="outline"
+                                                size="sm"
+                                                className="text-white border-gray-600 hover:bg-gray-800"
+                                            >
+                                                Logout
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <Link
+                                            href="/admin/login"
+                                            className="text-gray-300 hover:text-yellow-400 text-sm px-3 py-2 font-medium transition-all duration-200 no-underline"
+                                            style={{ textDecoration: 'none' }}
+                                        >
+                                            Admin Login
+                                        </Link>
+                                    )}
+                                </>
+                            )}
                             <Link
                                 href="/contact"
                                 className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-full text-sm font-medium hover:from-purple-700 hover:to-pink-700 transition-all duration-200 transform hover:scale-105 no-underline"
