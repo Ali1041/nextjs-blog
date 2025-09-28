@@ -4,27 +4,67 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { X } from "lucide-react"
+import RichTextEditor from "@/components/RichTextEditor"
 
 export default function NewBlogPost() {
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
   const [author, setAuthor] = useState("")
   const [image, setImage] = useState("")
+  const [selectedFile, setSelectedFile] = useState(null)
   const [tag, setTag] = useState("")
   const [tags, setTags] = useState([])
+  const [uploading, setUploading] = useState(false)
   const router = useRouter()
+
+
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0]
+    setSelectedFile(file)
+  }
+
+  const uploadImage = async (file) => {
+    if (!file) return null
+
+    const response = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+      method: 'POST',
+      body: file,
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      return data.url
+    } else {
+      throw new Error('Upload failed')
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    let imageUrl = image
+
+    if (selectedFile) {
+      setUploading(true)
+      try {
+        imageUrl = await uploadImage(selectedFile)
+      } catch (error) {
+        console.error('Error uploading image:', error)
+        setUploading(false)
+        return
+      }
+      setUploading(false)
+    }
+
     const response = await fetch("/api/posts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ title, content, author, image, tags }),
+      body: JSON.stringify({ title, content, author, image: imageUrl, tags }),
     })
 
     if (response.ok) {
@@ -65,36 +105,50 @@ export default function NewBlogPost() {
             <label htmlFor="content" className="block text-sm font-medium text-gray-300 mb-2">
               Content
             </label>
-            <Textarea
-              id="content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              required
-              className="bg-gray-900/50 border-gray-800 text-white"
-              rows={10}
+            <RichTextEditor
+              content={content}
+              onChange={setContent}
+              placeholder="Start writing your blog post..."
             />
           </div>
           <div className="mb-4">
             <label htmlFor="author" className="block text-sm font-medium text-gray-300 mb-2">
-              Author
+              Author (Optional)
             </label>
             <Input
               id="author"
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
-              required
               className="bg-gray-900/50 border-gray-800 text-white"
             />
           </div>
           <div className="mb-4">
             <label htmlFor="image" className="block text-sm font-medium text-gray-300 mb-2">
-              Image URL
+              Featured Image
+            </label>
+            <input
+              type="file"
+              id="image"
+              accept="image/*"
+              onChange={handleFileSelect}
+              className="bg-gray-900/50 border-gray-800 text-white rounded-md px-3 py-2 w-full file:bg-[#40e0d0] file:text-black file:rounded file:px-3 file:py-1 file:mr-3 file:border-none"
+            />
+            {selectedFile && (
+              <p className="text-sm text-gray-400 mt-2">
+                Selected: {selectedFile.name}
+              </p>
+            )}
+          </div>
+          <div className="mb-4">
+            <label htmlFor="image-url" className="block text-sm font-medium text-gray-300 mb-2">
+              Or enter Image URL
             </label>
             <Input
-              id="image"
+              id="image-url"
               value={image}
               onChange={(e) => setImage(e.target.value)}
               className="bg-gray-900/50 border-gray-800 text-white"
+              placeholder="https://example.com/image.jpg"
             />
           </div>
           <div className="mb-4">
@@ -121,12 +175,11 @@ export default function NewBlogPost() {
               ))}
             </div>
           </div>
-          <Button type="submit" className="w-full">
-            Create Post
+          <Button type="submit" disabled={uploading} className="w-full">
+            {uploading ? "Uploading..." : "Create Post"}
           </Button>
         </form>
       </div>
     </div>
   )
 }
-
