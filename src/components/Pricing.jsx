@@ -17,7 +17,7 @@ const Pricing = () => {
                             <p className="mb-8" data-aos="fade-up-sm" data-aos-delay="150">
                                 Every project is unique. Contact us for a personalized quote tailored to your specific needs and budget.
                             </p>
-                            <div className="d-flex flex-column flex-md-row gap-4 justify-content-center" data-aos="fade-up-sm" data-aos-delay="200">
+                            <div className="d-flex flex-column flex-md-row gap-4 justify-center" data-aos="fade-up-sm" data-aos-delay="200">
                                 <a href="/contact" className="btn btn-lg btn-gradient-1">
                                     Get Custom Quote
                                 </a>

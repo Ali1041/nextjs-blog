@@ -15,7 +15,7 @@ const LandingPage = () => {
     return (
         <div className="wrapper d-flex flex-column justify-between">
             <Navbar />
-            <main className="flex-grow-1">
+            <main className="flex-grow-1 mt-16">
                 <Hero />
                 <Features />
                 <Features3 />
