@@ -1,15 +1,26 @@
 import { NextResponse } from "next/server"
+import { supabase } from "@/lib/db"
 
 export async function POST() {
-    // Clear the admin token cookie
-    const response = NextResponse.json({ success: true })
+    try {
+        // Sign out from Supabase
+        const { error } = await supabase.auth.signOut()
 
-    response.cookies.set("admin-token", "", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 0 // Expire immediately
-    })
+        if (error) {
+            console.error('Supabase logout error:', error)
+            return NextResponse.json(
+                { error: "Failed to logout" },
+                { status: 500 }
+            )
+        }
 
-    return response
+        const response = NextResponse.json({ success: true })
+        return response
+    } catch (error) {
+        console.error("Logout error:", error)
+        return NextResponse.json(
+            { error: "Internal server error" },
+            { status: 500 }
+        )
+    }
 }

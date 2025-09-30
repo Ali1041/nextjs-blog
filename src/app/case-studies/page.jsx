@@ -8,17 +8,26 @@ import Navbar from "@/components/Navbar"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Edit } from 'lucide-react'
+import { getCurrentUser } from "@/lib/auth"
 
 export default function CaseStudiesPage() {
     const [caseStudies, setCaseStudies] = useState([])
     const [loading, setLoading] = useState(true)
     const [currentPage, setCurrentPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
+    const [isAdmin, setIsAdmin] = useState(false)
     const itemsPerPage = 6
 
     useEffect(() => {
         fetchCaseStudies()
+        checkAdmin()
     }, [currentPage])
+
+    const checkAdmin = async () => {
+        const user = await getCurrentUser()
+        setIsAdmin(!!user)
+        console.log("User:", user)
+    }
 
     const fetchCaseStudies = async () => {
         setLoading(true)
@@ -72,7 +81,7 @@ export default function CaseStudiesPage() {
                         <p className="text-gray-400 text-lg">
                             Explore real-world examples of how we've helped businesses transform and succeed with our solutions.
                         </p>
-                        <div className="mt-6">
+                        {isAdmin && <div className="mt-6">
                             <Link
                                 href="/case-studies/new"
                                 className="inline-flex items-center px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors"
@@ -80,7 +89,7 @@ export default function CaseStudiesPage() {
                                 <Edit className="w-4 h-4 mr-2" />
                                 Create Case Study
                             </Link>
-                        </div>
+                        </div>}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

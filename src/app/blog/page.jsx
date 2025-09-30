@@ -1,16 +1,72 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import Image from "next/image"
-import { Pagination } from "@/components/pagination"
-import { getPosts } from "./action"
+import { Badge } from "@/components/ui/badge"
 import Navbar from "@/components/Navbar"
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight, Edit } from 'lucide-react'
+import { getCurrentUser } from "@/lib/auth"
 
-export default async function BlogPage({
-  searchParams,
-}) {
-  const currentPage = Number(searchParams.page) || 1
-  const { posts, totalPages } = await getPosts(currentPage)
+export default function BlogPage() {
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const itemsPerPage = 6
+
+  useEffect(() => {
+    fetchPosts()
+    checkAdmin()
+  }, [currentPage])
+
+  const checkAdmin = async () => {
+    const user = await getCurrentUser()
+    setIsAdmin(!!user)
+    console.log("User:", user)
+  }
+
+  const fetchPosts = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch(`/api/posts?page=${currentPage}&limit=${itemsPerPage}`)
+      if (response.ok) {
+        const data = await response.json()
+        setPosts(data.posts || [])
+        setTotalPages(data.totalPages || 1)
+      } else {
+        setPosts([])
+      }
+    } catch (error) {
+      console.error('Error fetching posts:', error)
+      setPosts([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1)
+    }
+  }
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-24 pb-12 flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -23,13 +79,15 @@ export default async function BlogPage({
               <span className="bg-gradient-to-r from-[#40e0d0] to-[#7dff8e] text-transparent bg-clip-text">Insights</span>
             </h1>
             <p className="text-gray-400">Explore our thoughts on technology, design, and digital transformation</p>
-          </div>
-          <div className="flex justify-center mb-12">
-            <Link href="/blog/new">
-              <button className="bg-[#40e0d0] hover:bg-[#40e0d0]/80 text-black font-semibold px-6 py-3 rounded-lg transition-colors">
+            {isAdmin && <div className="mt-6">
+              <Link
+                href="/blog/new"
+                className="inline-flex items-center px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                <Edit className="w-4 h-4 mr-2" />
                 Create New Post
-              </button>
-            </Link>
+              </Link>
+            </div>}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (
@@ -62,7 +120,29 @@ export default async function BlogPage({
               </Link>
             ))}
           </div>
-          <Pagination currentPage={currentPage} totalPages={totalPages} />
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 mt-12">
+              <Button
+                variant="outline"
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="w-4 h-4 mr-2" />
+                Previous
+              </Button>
+              <span className="text-gray-400">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                Next
+                <ChevronRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </>

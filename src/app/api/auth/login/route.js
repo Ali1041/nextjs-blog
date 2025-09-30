@@ -1,12 +1,5 @@
 import { NextResponse } from "next/server"
-import { compare } from "bcryptjs"
-import { sign } from "jsonwebtoken"
-
-// Simple user database - in production you'd use a real database
-const ADMIN_USER = {
-    email: process.env.ADMIN_EMAIL || "admin@example.com",
-    password: process.env.ADMIN_PASSWORD_HASH || "$2a$10$hash_not_set"
-}
+import { supabase } from "@/lib/db"
 
 export async function POST(request) {
     try {
@@ -19,36 +12,24 @@ export async function POST(request) {
             )
         }
 
-        // Check credentials
-        if (email !== ADMIN_USER.email) {
+        // Authenticate with Supabase
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        })
+
+        if (error) {
             return NextResponse.json(
                 { error: "Invalid credentials" },
                 { status: 401 }
             )
         }
 
-        if (!await compare(password, ADMIN_USER.password)) {
-            return NextResponse.json(
-                { error: "Invalid credentials" },
-                { status: 401 }
-            )
-        }
-
-        // Generate JWT token
-        const token = sign(
-            { email: ADMIN_USER.email, isAdmin: true },
-            process.env.JWT_SECRET || "fallback-secret-change-in-production",
-            { expiresIn: "24h" }
-        )
-
-        // Create response with cookie
-        const response = NextResponse.json({ success: true })
-
-        response.cookies.set("admin-token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-            maxAge: 60 * 60 * 24 // 24 hours
+        // Create success response
+        // Supabase handles session management automatically
+        const response = NextResponse.json({
+            success: true,
+            user: { email: data.user.email }
         })
 
         return response

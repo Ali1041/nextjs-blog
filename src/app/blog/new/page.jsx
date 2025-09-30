@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { X } from "lucide-react"
 import RichTextEditor from "@/components/RichTextEditor"
+import { supabase } from "@/lib/db"
 
 export default function NewBlogPost() {
   const [title, setTitle] = useState("")
@@ -19,7 +20,21 @@ export default function NewBlogPost() {
   const [uploading, setUploading] = useState(false)
   const router = useRouter()
 
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      const { data, error } = await supabase.auth.getSession()
+      if (error) {
+        router.push("/admin/login")
+        return
+      }
+      if (!data?.session?.user) {
+        router.push("/admin/login")
+        return
+      }
+    };
 
+    checkAdminStatus();
+  }, [])
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0]

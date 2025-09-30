@@ -5,6 +5,7 @@ import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import logo from "@/assets/images/logo.png";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/db"
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,15 +15,10 @@ const Navbar = () => {
     useEffect(() => {
         // Check admin status on component mount
         const checkAdminStatus = async () => {
-            try {
-                const response = await fetch('/api/auth/check');
-                const data = await response.json();
-                setIsAdmin(data.isAdmin || false);
-            } catch (error) {
-                setIsAdmin(false);
-            } finally {
-                setLoadingAdmin(false);
-            }
+            const { data, error } = await supabase.auth.getSession()
+            setIsAdmin(!error && data?.session?.user ? true : false);
+            setLoadingAdmin(false);
+            console.log(data, error)
         };
 
         checkAdminStatus();
@@ -33,14 +29,7 @@ const Navbar = () => {
     };
 
     const handleLogout = async () => {
-        try {
-            await fetch('/api/auth/logout', { method: 'POST' });
-            setIsAdmin(false);
-            // Refresh the page to update UI
-            window.location.reload();
-        } catch (error) {
-            console.error('Logout failed');
-        }
+        const { error } = await supabase.auth.signOut()
     };
 
     return (

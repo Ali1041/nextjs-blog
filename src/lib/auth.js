@@ -1,27 +1,23 @@
-import { verify } from "jsonwebtoken"
-import { cookies } from "next/headers"
+import { supabase } from "./db"
 
 export async function getIsAdmin() {
     try {
-        const cookieStore = await cookies()
-        const token = cookieStore.get("admin-token")?.value
+        const { data: { session } } = await supabase.auth.getSession()
 
-        if (!token) {
-            return false
-        }
-
-        const decoded = verify(token, process.env.JWT_SECRET || "fallback-secret-change-in-production")
-
-        return decoded.isAdmin === true
+        // Check if user is authenticated via Supabase
+        return !!session?.user
     } catch (error) {
+        console.error('Error checking admin status:', error)
         return false
     }
 }
 
-export function getAdminTokenPayload(token) {
+export async function getCurrentUser() {
     try {
-        return verify(token, process.env.JWT_SECRET || "fallback-secret-change-in-production")
+        const { data: { session } } = await supabase.auth.getSession()
+        return session?.user || null
     } catch (error) {
+        console.error('Error getting current user:', error)
         return null
     }
 }

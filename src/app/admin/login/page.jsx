@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { supabase } from "@/lib/db"
 
 export default function AdminLogin() {
     const [email, setEmail] = useState("")
@@ -18,28 +19,17 @@ export default function AdminLogin() {
         setLoading(true)
         setError("")
 
-        try {
-            const response = await fetch("/api/auth/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email, password }),
-            })
-
-            const data = await response.json()
-
-            if (response.ok) {
-                router.push("/")
-                router.refresh()
-            } else {
-                setError(data.error || "Login failed")
-            }
-        } catch (error) {
-            setError("An error occurred. Please try again.")
-        } finally {
+        const { user, session, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        })
+        if (error) {
+            setError(error.message || "Login failed")
             setLoading(false)
+            return
         }
+        router.push("/")
+        setLoading(false)
     }
 
     return (
