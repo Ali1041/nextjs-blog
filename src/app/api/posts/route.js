@@ -1,24 +1,44 @@
 import { NextResponse } from "next/server"
-import { openDb } from "@/lib/db"
+import { supabase } from "@/lib/db"
 
 export async function GET() {
-    const db = await openDb()
-    const posts = await db.all("SELECT * FROM posts ORDER BY created_at DESC")
-    // Parse tags as arrays
+    const { data: posts, error } = await supabase
+        .from('posts')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+    if (error) {
+        console.error('Error fetching posts:', error)
+        return NextResponse.json({ error: 'Failed to fetch posts' }, { status: 500 })
+    }
+
+    // Ensure tags are arrays (though Supabase should return them as arrays)
     posts.forEach(post => {
-        post.tags = post.tags ? post.tags.split(",") : []
+        post.tags = Array.isArray(post.tags) ? post.tags : (post.tags ? post.tags.split(",") : [])
     })
     return NextResponse.json(posts)
 }
 
 export async function POST(request) {
     const { title, content, author, image, tags, status = 'draft' } = await request.json()
-    const db = await openDb()
-    const result = await db.run(
-        "INSERT INTO posts (title, content, author, image, tags, status) VALUES (?, ?, ?, ?, ?, ?)",
-        [title, content, author, image, tags ? tags.join(",") : "", status]
-    )
-    const newPost = await db.get("SELECT * FROM posts WHERE id = ?", result.lastID)
-    newPost.tags = newPost.tags ? newPost.tags.split(",") : []
-    return NextResponse.json(newPost, { status: 201 })
+
+    const { data, error } = await supabase
+        .from('posts')
+        .insert([{
+            title,
+            content,
+            author,
+            image,
+            tags: tags || [], // Store as array
+            status
+        }])
+        .select()
+        .single()
+
+    if (error) {
+        console.error('Error creating post:', error)
+        return NextResponse.json({ error: 'Failed to create post' }, { status: 500 })
+    }
+
+    return NextResponse.json(data, { status: 201 })
 }
