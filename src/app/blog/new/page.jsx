@@ -74,15 +74,22 @@ export default function NewBlogPost() {
       setUploading(false)
     }
 
-    const response = await fetch("/api/posts", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ title, content, author, image: imageUrl, tags }),
-    })
+    const { data, error } = await supabase
+      .from('posts')
+      .insert([{
+        title,
+        content,
+        author,
+        image: imageUrl,
+        tags: tags || [],
+        status: 'draft'
+      }])
+      .select()
+      .single()
 
-    if (response.ok) {
+    if (error) {
+      console.error('Error creating post:', error)
+    } else {
       router.push("/blog")
       router.refresh()
     }

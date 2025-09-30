@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { X } from "lucide-react"
 import RichTextEditor from "@/components/RichTextEditor"
+import { supabase } from "@/lib/db"
 
 export default function EditBlogPost() {
     const [title, setTitle] = useState("")
@@ -49,18 +50,24 @@ export default function EditBlogPost() {
 
     const fetchPost = async () => {
         try {
-            const response = await fetch(`/api/posts/${params.id}`)
-            if (response.ok) {
-                const post = await response.json()
-                setTitle(post.title || "")
-                setContent(post.content || "")
-                setAuthor(post.author || "")
-                setImage(post.image || "")
-                setTags(post.tags || [])
-                setStatus(post.status || "draft")
-            } else {
+            const { data: post, error } = await supabase
+                .from('posts')
+                .select('*')
+                .eq('id', params.id)
+                .single()
+
+            if (error) {
+                console.error("Error fetching post:", error)
                 router.push("/blog")
+                return
             }
+
+            setTitle(post.title || "")
+            setContent(post.content || "")
+            setAuthor(post.author || "")
+            setImage(post.image || "")
+            setTags(post.tags || [])
+            setStatus(post.status || "draft")
         } catch (error) {
             console.error("Error fetching post:", error)
             router.push("/blog")
@@ -86,15 +93,23 @@ export default function EditBlogPost() {
         }
 
         try {
-            const response = await fetch(`/api/posts/${params.id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ title, content, author, image: imageUrl, tags, status }),
-            })
+            const { data, error } = await supabase
+                .from('posts')
+                .update({
+                    title,
+                    content,
+                    author,
+                    image: imageUrl,
+                    tags: tags || [],
+                    status
+                })
+                .eq('id', params.id)
+                .select()
+                .single()
 
-            if (response.ok) {
+            if (error) {
+                console.error('Error updating post:', error)
+            } else {
                 router.push(`/blog/${params.id}`)
                 router.refresh()
             }

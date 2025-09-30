@@ -10,7 +10,8 @@ export async function POST(request) {
         const blob = await put(filename, request.body, {
             access: 'public',
             token: process.env.BLOB_READ_WRITE_TOKEN,
-            store: 'store_iDnrOcx8gHZ6YMOU'
+            store: 'store_iDnrOcx8gHZ6YMOU',
+            addRandomSuffix: true
         })
 
         return NextResponse.json(blob)

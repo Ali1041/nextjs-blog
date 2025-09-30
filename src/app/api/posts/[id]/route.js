@@ -13,7 +13,7 @@ export async function GET(request, { params }) {
         return NextResponse.json({ error: "Post not found" }, { status: 404 })
     }
 
-    // Ensure tags is an array
+    // Ensure tags are arrays
     post.tags = Array.isArray(post.tags) ? post.tags : (post.tags ? post.tags.split(",") : [])
     return NextResponse.json(post)
 }
@@ -44,7 +44,7 @@ export async function PUT(request, { params }) {
     return NextResponse.json(data)
 }
 
-// DELETE a post
+// DELETE a post (if needed)
 export async function DELETE(request, { params }) {
     const { error } = await supabase
         .from('posts')

@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -10,35 +10,25 @@ import RichTextEditor from "@/components/RichTextEditor"
 import Navbar from "@/components/Navbar"
 import { supabase } from "@/lib/db"
 
-export default function NewCaseStudy() {
+export default function EditCaseStudy() {
     const [title, setTitle] = useState("")
     const [content, setContent] = useState("")
     const [author, setAuthor] = useState("")
     const [client, setClient] = useState("")
     const [industry, setIndustry] = useState("")
     const [results, setResults] = useState("")
-    const [tag, setTag] = useState("")
-    const [tags, setTags] = useState([])
     const [image, setImage] = useState("")
     const [selectedFile, setSelectedFile] = useState(null)
-    const [uploading, setUploading] = useState(false)
+    const [tag, setTag] = useState("")
+    const [tags, setTags] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [saving, setSaving] = useState(false)
     const router = useRouter()
+    const params = useParams()
 
     useEffect(() => {
-        const checkAdminStatus = async () => {
-            const { data, error } = await supabase.auth.getSession()
-            if (error) {
-                router.push("/admin/login")
-                return
-            }
-            if (!data?.session?.user) {
-                router.push("/admin/login")
-                return
-            }
-        };
-
-        checkAdminStatus();
-    }, [])
+        fetchCaseStudy()
+    }, [params.id])
 
     const handleFileSelect = (e) => {
         const file = e.target.files[0]
@@ -61,43 +51,79 @@ export default function NewCaseStudy() {
         }
     }
 
+    const fetchCaseStudy = async () => {
+        try {
+            const { data: study, error } = await supabase
+                .from('case_studies')
+                .select('*')
+                .eq('id', params.id)
+                .single()
+
+            if (error) {
+                console.error("Error fetching case study:", error)
+                router.push("/case-studies")
+                return
+            }
+
+            setTitle(study.title || "")
+            setContent(study.content || "")
+            setAuthor(study.author || "")
+            setClient(study.client || "")
+            setIndustry(study.industry || "")
+            setResults(study.results || "")
+            setImage(study.image || "")
+            setTags(study.tags || [])
+        } catch (error) {
+            console.error("Error fetching case study:", error)
+            router.push("/case-studies")
+        } finally {
+            setLoading(false)
+        }
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
+        setSaving(true)
 
         let imageUrl = image
 
         if (selectedFile) {
-            setUploading(true)
             try {
                 imageUrl = await uploadImage(selectedFile)
             } catch (error) {
                 console.error('Error uploading image:', error)
-                setUploading(false)
+                setSaving(false)
                 return
             }
-            setUploading(false)
         }
 
-        const { data, error } = await supabase
-            .from('case_studies')
-            .insert([{
-                title,
-                content,
-                author,
-                client,
-                industry,
-                results,
-                image: imageUrl,
-                tags: tags || []
-            }])
-            .select()
-            .single()
+        try {
+            const { data, error } = await supabase
+                .from('case_studies')
+                .update({
+                    title,
+                    content,
+                    author,
+                    client,
+                    industry,
+                    results,
+                    image: imageUrl,
+                    tags: tags || []
+                })
+                .eq('id', params.id)
+                .select()
+                .single()
 
-        if (error) {
-            console.error('Error creating case study:', error)
-        } else {
-            router.push("/case-studies")
-            router.refresh()
+            if (error) {
+                console.error('Error updating case study:', error)
+            } else {
+                router.push(`/case-studies/${params.id}`)
+                router.refresh()
+            }
+        } catch (error) {
+            console.error("Error updating case study:", error)
+        } finally {
+            setSaving(false)
         }
     }
 
@@ -112,11 +138,20 @@ export default function NewCaseStudy() {
         setTags(tags.filter((t) => t !== tagToRemove))
     }
 
+    if (loading) {
+        return (
+            <div className="min-h-screen pt-24 pb-12 flex items-center justify-center">
+                <Navbar />
+                <div className="text-white">Loading...</div>
+            </div>
+        )
+    }
+
     return (
         <div className="min-h-screen pt-24 pb-12">
             <Navbar />
             <div className="container mx-auto px-4">
-                <h1 className="text-4xl font-bold mb-8 text-center">Create New Case Study</h1>
+                <h1 className="text-4xl font-bold mb-8 text-center">Edit Case Study</h1>
                 <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
                     <div className="mb-4">
                         <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-2">
@@ -226,7 +261,7 @@ export default function NewCaseStudy() {
                                 onChange={(e) => setTag(e.target.value)}
                                 className="bg-gray-900/50 border-gray-800 text-white mr-2"
                             />
-                            <Button type="button" onClick={addTag}>
+                            <Button type="button" onClick={addTag} variant="outline">
                                 Add Tag
                             </Button>
                         </div>
@@ -239,9 +274,19 @@ export default function NewCaseStudy() {
                             ))}
                         </div>
                     </div>
-                    <Button type="submit" disabled={uploading} className="w-full">
-                        {uploading ? "Uploading..." : "Create Case Study"}
-                    </Button>
+                    <div className="flex gap-4">
+                        <Button type="submit" disabled={saving} className="flex-1">
+                            {saving ? "Saving..." : "Save Changes"}
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={() => router.push(`/case-studies/${params.id}`)}
+                            variant="outline"
+                            className="flex-1"
+                        >
+                            Cancel
+                        </Button>
+                    </div>
                 </form>
             </div>
         </div>

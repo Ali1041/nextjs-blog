@@ -67,15 +67,23 @@ export default async function CaseStudyPage({ params }) {
                                 </div>
 
                                 <div className="p-6 md:p-8">
-                                    <div className="flex items-center gap-4 mb-4">
-                                        {study.industry && (
-                                            <span className="px-3 py-1 bg-[#40e0d0] text-black rounded-full text-xs font-semibold">
-                                                {study.industry}
+                                    <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+                                        <div className="flex flex-wrap items-center gap-4">
+                                            {study.industry && (
+                                                <span className="px-3 py-1 bg-[#40e0d0] text-black rounded-full text-xs font-semibold">
+                                                    {study.industry}
+                                                </span>
+                                            )}
+                                            <span className="text-gray-400 text-sm">
+                                                Client: {study.client}
                                             </span>
-                                        )}
-                                        <span className="text-gray-400 text-sm">
-                                            Client: {study.client}
-                                        </span>
+                                        </div>
+                                        <Button asChild variant="outline" size="sm">
+                                            <Link href={`/case-studies/${params.id}/edit`}>
+                                                <Edit className="w-4 h-4 mr-2" />
+                                                Edit
+                                            </Link>
+                                        </Button>
                                     </div>
 
                                     <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-white">

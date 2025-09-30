@@ -91,7 +91,7 @@ export default function BlogPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (
-              <Link key={post.id} href={`/blog/${post.id}`}>
+              <Link key={post.id} href={`/blog/${post.id}`} className="no-underline">
                 <Card className="h-full bg-gray-900/50 border-gray-800 hover:border-gray-700 transition-colors">
                   <CardHeader className="p-0">
                     <Image
