@@ -45,7 +45,7 @@ export const metadata = {
     description: 'Leading software development agency specializing in full-stack web development, mobile apps, AI solutions, and digital transformation.',
     images: [
       {
-        url: '/assets/images/space-technology-hero.jpg',
+        url: 'https://idnrocx8ghz6ymou.public.blob.vercel-storage.com/space_technology_hero.png',
         width: 1200,
         height: 630,
         alt: 'Ijaad Labs - Advanced Software Development and AI Solutions',
@@ -56,7 +56,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Ijaad Labs - Full-Stack Software Development & AI Solutions',
     description: 'Leading software development agency specializing in full-stack web development, mobile apps, AI solutions, and digital transformation.',
-    images: ['/assets/images/space-technology-hero.jpg'],
+    images: ['https://idnrocx8ghz6ymou.public.blob.vercel-storage.com/space_technology_hero.png'],
     creator: '@ijaadlabs',
   },
   verification: {
@@ -77,7 +77,7 @@ export default function RootLayout({
     "description": "Leading software development agency specializing in full-stack web development, mobile apps, AI solutions, and digital transformation.",
     "url": "https://ijaadlabs.com",
     "logo": "https://ijaadlabs.com/assets/images/logo.png",
-    "image": "https://ijaadlabs.com/assets/images/space-technology-hero.jpg",
+    "image": "https://idnrocx8ghz6ymou.public.blob.vercel-storage.com/space_technology_hero.png",
     "foundingDate": "2024",
     "address": {
       "@type": "PostalAddress",

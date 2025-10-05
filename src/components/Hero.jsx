@@ -47,7 +47,7 @@ const Hero = () => {
                                 <div className="image-with-shape">
                                     <img src="/assets/images/shapes/blurry-shape-1.svg" alt="Decorative background shape" className="shape animate-scale" />
                                     <div className="mt-12 rounded-5 border border-primary-dark shadow-lg overflow-hidden position-relative z-1">
-                                        <img className="img-fluid d-inline-block" src="/assets/images/space-technology-hero.jpg" alt="Ijaad Labs - Advanced software development and AI solutions in a futuristic technology environment" />
+                                        <img className="" src="https://idnrocx8ghz6ymou.public.blob.vercel-storage.com/2023_ultimate_innovation_lab_team_twitter.png" alt="Ijaad Labs - Advanced software development and AI solutions in a futuristic technology environment" />
                                     </div>
                                 </div>
                             </div>
