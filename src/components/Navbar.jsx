@@ -12,6 +12,23 @@ const Navbar = () => {
     const [isAdmin, setIsAdmin] = useState(false);
     const [loadingAdmin, setLoadingAdmin] = useState(true);
 
+    const scrollToSection = (sectionId) => {
+        // Check if we're on the landing page
+        if (window.location.pathname === '/' || window.location.pathname === '/landing') {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                });
+            }
+        } else {
+            // If not on landing page, redirect to landing page with hash
+            window.location.href = `/landing#${sectionId}`;
+        }
+        setIsMenuOpen(false); // Close mobile menu
+    };
+
     useEffect(() => {
         // Check admin status on component mount
         const checkAdminStatus = async () => {
@@ -22,6 +39,33 @@ const Navbar = () => {
         };
 
         checkAdminStatus();
+    }, []);
+
+    useEffect(() => {
+        // Handle hash scrolling when page loads with a hash
+        const handleHashScroll = () => {
+            const hash = window.location.hash.substring(1); // Remove the # symbol
+            if (hash) {
+                // Wait a bit for the page to fully load
+                setTimeout(() => {
+                    const element = document.getElementById(hash);
+                    if (element) {
+                        element.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                        });
+                    }
+                }, 100);
+            }
+        };
+
+        // Run on mount and when hash changes
+        handleHashScroll();
+        window.addEventListener('hashchange', handleHashScroll);
+
+        return () => {
+            window.removeEventListener('hashchange', handleHashScroll);
+        };
     }, []);
 
     const toggleMenu = () => {
@@ -54,27 +98,36 @@ const Navbar = () => {
                     {/* Desktop Navigation */}
                     <div className="hidden lg:flex items-center space-x-8">
                         <div className="flex items-center space-x-8">
-                            <Link
-                                href="/"
-                                className="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-all duration-200 no-underline"
-                                style={{ textDecoration: 'none' }}
+                            <button
+                                onClick={() => scrollToSection('hero')}
+                                className="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-all duration-200 cursor-pointer"
                             >
                                 Home
-                            </Link>
-                            <Link
-                                href="#about"
-                                className="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-all duration-200 no-underline"
-                                style={{ textDecoration: 'none' }}
+                            </button>
+                            <button
+                                onClick={() => scrollToSection('features')}
+                                className="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-all duration-200 cursor-pointer"
                             >
                                 About Us
-                            </Link>
-                            <Link
-                                href="/contact"
-                                className="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-all duration-200 no-underline"
-                                style={{ textDecoration: 'none' }}
+                            </button>
+                            <button
+                                onClick={() => scrollToSection('projects')}
+                                className="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-all duration-200 cursor-pointer"
                             >
-                                Contact
-                            </Link>
+                                Projects
+                            </button>
+                            <button
+                                onClick={() => scrollToSection('pricing')}
+                                className="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-all duration-200 cursor-pointer"
+                            >
+                                Pricing
+                            </button>
+                            <button
+                                onClick={() => scrollToSection('faq')}
+                                className="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-all duration-200 cursor-pointer"
+                            >
+                                FAQ
+                            </button>
                             <Link
                                 href="/blog"
                                 className="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-all duration-200 no-underline"
@@ -91,38 +144,19 @@ const Navbar = () => {
                             </Link>
                         </div>
                         <div className="flex items-center space-x-4">
-                            {!loadingAdmin && (
-                                <>
-                                    {isAdmin ? (
-                                        <div className="flex items-center space-x-3">
-                                            <span className="text-green-400 text-sm">Admin</span>
-                                            <Button
-                                                onClick={handleLogout}
-                                                variant="outline"
-                                                size="sm"
-                                                className="text-white border-gray-600 hover:bg-gray-800"
-                                            >
-                                                Logout
-                                            </Button>
-                                        </div>
-                                    ) : (
-                                        <Link
-                                            href="/admin/login"
-                                            className="text-gray-300 hover:text-yellow-400 text-sm px-3 py-2 font-medium transition-all duration-200 no-underline"
-                                            style={{ textDecoration: 'none' }}
-                                        >
-                                            Admin Login
-                                        </Link>
-                                    )}
-                                </>
+                            {!loadingAdmin && isAdmin && (
+                                <div className="flex items-center space-x-3">
+                                    <span className="text-green-400 text-sm">Admin</span>
+                                    <Button
+                                        onClick={handleLogout}
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-white border-gray-600 hover:bg-gray-800"
+                                    >
+                                        Logout
+                                    </Button>
+                                </div>
                             )}
-                            <Link
-                                href="/contact"
-                                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-full text-sm font-medium hover:from-purple-700 hover:to-pink-700 transition-all duration-200 transform hover:scale-105 no-underline"
-                                style={{ textDecoration: 'none' }}
-                            >
-                                Get Started
-                            </Link>
                         </div>
                     </div>
 
@@ -149,30 +183,36 @@ const Navbar = () => {
                 {/* Mobile Navigation Menu */}
                 <div className={`lg:hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-96 opacity-100 pb-4' : 'max-h-0 opacity-0 overflow-hidden'}`}>
                     <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-slate-800 rounded-lg mt-2">
-                        <a
-                            href="/"
-                            className="text-gray-300 hover:text-yellow-400 block px-3 py-2 text-base font-medium transition-all duration-200 no-underline"
-                            style={{ textDecoration: 'none' }}
-                            onClick={() => setIsMenuOpen(false)}
+                        <button
+                            onClick={() => scrollToSection('hero')}
+                            className="text-gray-300 hover:text-yellow-400 block px-3 py-2 text-base font-medium transition-all duration-200 w-full text-left"
                         >
                             Home
-                        </a>
-                        <a
-                            href="#about"
-                            className="text-gray-300 hover:text-yellow-400 block px-3 py-2 text-base font-medium transition-all duration-200 no-underline"
-                            style={{ textDecoration: 'none' }}
-                            onClick={() => setIsMenuOpen(false)}
+                        </button>
+                        <button
+                            onClick={() => scrollToSection('features')}
+                            className="text-gray-300 hover:text-yellow-400 block px-3 py-2 text-base font-medium transition-all duration-200 w-full text-left"
                         >
                             About Us
-                        </a>
-                        <a
-                            href="/contact"
-                            className="text-gray-300 hover:text-yellow-400 block px-3 py-2 text-base font-medium transition-all duration-200 no-underline"
-                            style={{ textDecoration: 'none' }}
-                            onClick={() => setIsMenuOpen(false)}
+                        </button>
+                        <button
+                            onClick={() => scrollToSection('projects')}
+                            className="text-gray-300 hover:text-yellow-400 block px-3 py-2 text-base font-medium transition-all duration-200 w-full text-left"
                         >
-                            Contact
-                        </a>
+                            Projects
+                        </button>
+                        <button
+                            onClick={() => scrollToSection('pricing')}
+                            className="text-gray-300 hover:text-yellow-400 block px-3 py-2 text-base font-medium transition-all duration-200 w-full text-left"
+                        >
+                            Pricing
+                        </button>
+                        <button
+                            onClick={() => scrollToSection('faq')}
+                            className="text-gray-300 hover:text-yellow-400 block px-3 py-2 text-base font-medium transition-all duration-200 w-full text-left"
+                        >
+                            FAQ
+                        </button>
                         <a
                             href="/blog"
                             className="text-gray-300 hover:text-yellow-400 block px-3 py-2 text-base font-medium transition-all duration-200 no-underline"
@@ -189,16 +229,6 @@ const Navbar = () => {
                         >
                             Case Studies
                         </a>
-                        <div className="pt-4">
-                            <a
-                                href="/contact"
-                                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-full text-base font-medium hover:from-purple-700 hover:to-pink-700 transition-all duration-200 block text-center w-full no-underline"
-                                style={{ textDecoration: 'none' }}
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                Get Started
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>

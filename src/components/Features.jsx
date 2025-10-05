@@ -2,10 +2,10 @@ import React from 'react';
 
 const Features = () => {
     return (
-        <section className="py-10 py-lg-15">
+        <section id="features" className="py-10 py-lg-15" role="main" aria-labelledby="features-heading">
             <div className="container">
                 <div className="text-center mb-18">
-                    <h1 className="mb-0 text-white" data-aos="fade-up-sm" data-aos-delay="50">
+                    <h1 id="features-heading" className="mb-0 text-white" data-aos="fade-up-sm" data-aos-delay="50">
                         From Idea to Completion,<br className="d-none d-lg-block" />
                         we bring <span className="text-primary-dark">Full-Stack</span> Expertise 
                     </h1>

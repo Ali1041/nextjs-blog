@@ -24,7 +24,6 @@ const LandingPage = () => {
                 <Reviews />
                 <Pricing />
                 <FAQ />
-                <CTA />
             </main>
             <Footer />
         </div>

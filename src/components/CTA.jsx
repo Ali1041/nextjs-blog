@@ -1,7 +1,20 @@
-import React from 'react';
+"use client"
+import React, { useState } from 'react';
+import ContactModal from './ContactModal';
 
 const CTA = () => {
+    const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
+    const openContactModal = () => {
+        setIsContactModalOpen(true);
+    };
+
+    const closeContactModal = () => {
+        setIsContactModalOpen(false);
+    };
+
     return (
+        <>
         <section className="cta-section py-10 py-lg-15" data-aos="fade-up-sm" data-aos-offset="150">
             <div className="container">
                 <div className="rounded-5 border position-relative z-1 bg-dark-blue-4">
@@ -16,7 +29,13 @@ const CTA = () => {
                                     <span className="text-primary-dark">GenAI</span>
                                     you can save hours each week creating long-form content.
                                 </h2>
-                                <a href="/blog" className="btn btn-primary-dark">Get Started Free</a>
+                                <button 
+                                    onClick={openContactModal}
+                                    className="btn btn-primary-dark"
+                                    aria-label="Get started with Ijaad Labs software development services"
+                                >
+                                    Get Started Free
+                                </button>
                                 <div className="cta-image-container mt-10">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 34 90" className="text-primary-dark arrow-shape">
                                         <path fill="currentColor" d="M3.724 2.303c8.095 4.54 13.968 13.648 16.408 22.434 2.336 8.415 2.426 20.276-5.705 25.79-2.961 2.01-7.092 2.24-8.781-1.444-1.571-3.422.29-7.096 3.683-8.452 9.162-3.663 16.334 8.02 18.234 15.324a30.563 30.563 0 0 1 .279 14.195c-.952 4.334-2.866 9.283-6.298 12.254-.494.427-1.3-.29-.971-.84 1.77-2.928 3.677-5.571 4.79-8.851 1.155-3.405 1.62-7.048 1.44-10.626-.358-7.103-3.568-15.745-10.125-19.354-3.476-1.912-10.316-1.353-10.055 3.973.107 2.158 1.647 4.035 3.933 3.81 2.086-.209 4.001-1.766 5.333-3.279 5.427-6.16 4.857-15.89 2.67-23.215a39.21 39.21 0 0 0-5.682-11.577c-2.69-3.76-6.017-6.61-9.592-9.472-.35-.277.039-.896.44-.67Z" />
@@ -35,6 +54,13 @@ const CTA = () => {
                 </div>
             </div>
         </section>
+        
+        <ContactModal 
+            isOpen={isContactModalOpen} 
+            onClose={closeContactModal} 
+        />
+        </>
+        
     );
 };
 

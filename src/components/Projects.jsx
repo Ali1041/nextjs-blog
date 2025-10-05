@@ -2,20 +2,20 @@ import React from 'react';
 
 const Projects = () => {
     return (
-        <section className="pt-20 pt-lg-30 pb-10 pb-lg-15 bg-striped bg-striped-sm bg-striped-bottom bg-dark-blue-4">
+        <section id="projects" className="pt-20 pt-lg-30 pb-10 pb-lg-15 bg-striped bg-striped-sm bg-striped-bottom bg-dark-blue-4" role="main" aria-labelledby="projects-heading">
             <div className="container">
                 <div className="row justify-center mb-18">
                     <div className="col-lg-9">
                         <div className="text-center">
-                            <h1 className="text-white" data-aos="fade-up-sm" data-aos-delay="50">
+                            <h2 id="projects-heading" className="text-white" data-aos="fade-up-sm" data-aos-delay="50">
                                 Explore some of our latest projects.
-                            </h1>
-                            <span className="text-primary-dark">Innovators from across the industry have trusted Ijaad Labs to build high-impact products.</span>
+                            </h2>
+                            <p className="text-primary-dark">Innovators from across the industry have trusted Ijaad Labs to build high-impact products.</p>
                         </div>
                     </div>
                 </div>
-                <div className="review-carousel-container position-relative">
-                    <div className="swiper review-carousel">
+                <div className="projects-carousel-container position-relative">
+                    <div className="swiper projects-carousel">
                         <div className="swiper-wrapper">
                             <div className="swiper-slide h-auto">
                                 <div className="col" data-aos="fade-up-sm" data-aos-delay="200">

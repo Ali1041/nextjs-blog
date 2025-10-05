@@ -2,7 +2,7 @@ import React from 'react';
 
 const UseCases = () => {
     return (
-        <section className="bg-striped bg-striped-sm bg-striped-bottom bg-dark-blue-4 py-20 py-lg-30">
+        <section id="use-cases" className="bg-striped bg-striped-sm bg-striped-bottom bg-dark-blue-4 py-20 py-lg-30">
             <div className="container">
                 <div className="row justify-center mb-18">
                     <div className="col-lg-9">

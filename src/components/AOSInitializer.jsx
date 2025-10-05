@@ -47,7 +47,7 @@ const AOSInitializer = () => {
         }
 
         // Initialize Swiper carousels
-        const reviewCarousel = new Swiper(".review-carousel", {
+        const projectsCarousel = new Swiper(".projects-carousel", {
             modules: [Navigation, Pagination, Autoplay],
             loop: false,
             freemode: true,
@@ -59,7 +59,7 @@ const AOSInitializer = () => {
                 disableOnInteraction: true,
             },
             pagination: {
-                el: ".review-carousel-container .swiper-pagination",
+                el: ".projects-carousel-container .swiper-pagination",
                 type: "bullets",
                 clickable: true,
             },
@@ -72,83 +72,6 @@ const AOSInitializer = () => {
                 },
                 1200: {
                     slidesPerView: 3,
-                },
-            },
-        });
-
-        const reviewRollingCarousel = new Swiper(".review-rolling-carousel", {
-            modules: [Autoplay],
-            loop: true,
-            freemode: true,
-            slidesPerView: 1,
-            spaceBetween: 24,
-            centeredSlides: false,
-            allowTouchMove: true,
-            speed: 10000,
-            autoplay: {
-                delay: 1,
-                disableOnInteraction: false,
-            },
-            breakpoints: {
-                1: {
-                    slidesPerView: 1.1,
-                },
-                768: {
-                    slidesPerView: 2,
-                },
-                992: {
-                    slidesPerView: 2.5,
-                },
-                1200: {
-                    slidesPerView: 3,
-                },
-                1400: {
-                    slidesPerView: 3.5,
-                },
-                1600: {
-                    slidesPerView: 4,
-                },
-                1900: {
-                    slidesPerView: 4.5,
-                },
-            },
-        });
-
-        const reviewRollingCarouselReversed = new Swiper(".review-rolling-carousel-reversed", {
-            modules: [Autoplay],
-            loop: true,
-            freemode: true,
-            slidesPerView: 1,
-            spaceBetween: 24,
-            centeredSlides: false,
-            allowTouchMove: true,
-            speed: 8000,
-            autoplay: {
-                delay: 1,
-                reverseDirection: true,
-                disableOnInteraction: false,
-            },
-            breakpoints: {
-                1: {
-                    slidesPerView: 1.1,
-                },
-                768: {
-                    slidesPerView: 2,
-                },
-                992: {
-                    slidesPerView: 2.5,
-                },
-                1200: {
-                    slidesPerView: 3,
-                },
-                1400: {
-                    slidesPerView: 3.5,
-                },
-                1600: {
-                    slidesPerView: 4,
-                },
-                1900: {
-                    slidesPerView: 4.5,
                 },
             },
         });

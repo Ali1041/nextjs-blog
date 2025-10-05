@@ -1,0 +1,21 @@
+{
+  "name": "Ijaad Labs - Full-Stack Software Development & AI Solutions",
+  "short_name": "Ijaad Labs",
+  "description": "Leading software development agency specializing in full-stack web development, mobile apps, AI solutions, and digital transformation.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/images/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity", "technology"],
+  "lang": "en",
+  "dir": "ltr"
+}

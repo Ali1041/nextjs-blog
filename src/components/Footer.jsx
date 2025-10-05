@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 const Footer = () => {
     return (
-        <footer className="footer bg-striped pt-10 pt-lg-15">
+        <footer className="footer bg-striped pt-10 pt-lg-15" role="contentinfo">
             <div className="container">
                 <div className="row g-10">
                     <div className="col-lg-9 col-xl-8 order-lg-2">
@@ -15,7 +15,10 @@ const Footer = () => {
                                     <h6 className="text-white mb-2">Ijaad Labs</h6>
                                     <ul className="link-list list-unstyled mb-0">
                                         <li>
-                                            <Link href="/blog">Blog</Link>
+                                            <Link href="/blog" aria-label="Read our blog posts about software development">Blog</Link>
+                                        </li>
+                                        <li>
+                                            <Link href="/case-studies" aria-label="View our case studies and project portfolio">Case Studies</Link>
                                         </li>
                                     </ul>
                                 </div>
@@ -25,19 +28,19 @@ const Footer = () => {
                                     <h6 className="text-white mb-2">Services</h6>
                                     <ul className="link-list list-unstyled mb-0">
                                         <li>
-                                            <Link href="/blog">Web Development</Link>
+                                            <Link href="/landing#features" aria-label="Learn about our web development services">Web Development</Link>
                                         </li>
                                         <li>
-                                            <Link href="/blog">Mobile Apps</Link>
+                                            <Link href="/landing#features" aria-label="Learn about our mobile app development services">Mobile Apps</Link>
                                         </li>
                                         <li>
-                                            <Link href="/blog">Software Solutions</Link>
+                                            <Link href="/landing#features" aria-label="Learn about our software solutions">Software Solutions</Link>
                                         </li>
                                         <li>
-                                            <Link href="/blog">Generative AI</Link>
+                                            <Link href="/landing#features" aria-label="Learn about our AI and generative AI services">Generative AI</Link>
                                         </li>
                                         <li>
-                                            <Link href="/blog">Cloud Computing</Link>
+                                            <Link href="/landing#features" aria-label="Learn about our cloud computing services">Cloud Computing</Link>
                                         </li>
                                     </ul>
                                 </div>
