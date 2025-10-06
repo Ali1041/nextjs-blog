@@ -1,28 +1,65 @@
+"use client"
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { ArrowLeft } from 'lucide-react'
+import { Button } from "@/components/ui/button"
+import { ArrowLeft, Edit } from 'lucide-react'
 import Image from "next/image"
 import Link from "next/link"
 import Navbar from "@/components/Navbar"
-import { notFound } from "next/navigation"
+import { useParams } from "next/navigation"
+import { useState, useEffect } from "react"
+import { getCurrentUser } from "@/lib/auth"
 
-async function getCaseStudy(id) {
-    try {
-        const res = await fetch(`http://localhost:3000/api/case-studies/${id}`, {
-            cache: 'no-store' // Ensure fresh data
-        })
-        if (!res.ok) {
-            return null
-        }
-        return res.json()
-    } catch (error) {
-        console.error('Error fetching case study:', error)
-        return null
+export default function CaseStudyPage() {
+    const params = useParams()
+    const [study, setStudy] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [isAdmin, setIsAdmin] = useState(false)
+
+    useEffect(() => {
+        fetchCaseStudy()
+        checkAdmin()
+    }, [params.id])
+
+    const checkAdmin = async () => {
+        const user = await getCurrentUser()
+        setIsAdmin(!!user)
     }
-}
 
-export default async function CaseStudyPage({ params }) {
-    const study = await getCaseStudy(params.id)
+    const fetchCaseStudy = async () => {
+        try {
+            const res = await fetch(`/api/case-studies/${params.id}`, {
+                cache: 'no-store'
+            })
+            if (!res.ok) {
+                console.error('API response not ok:', res.status, res.statusText)
+                setStudy(null)
+            } else {
+                const data = await res.json()
+                console.log('Case study data received:', data)
+                setStudy(data)
+            }
+        } catch (error) {
+            console.error('Error fetching case study:', error)
+            setStudy(null)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    if (loading) {
+        return (
+            <div className="wrapper d-flex flex-column justify-between">
+                <Navbar />
+                <main className="flex-grow-1 pt-24 pb-12">
+                    <div className="container mx-auto px-4 text-center">
+                        <div className="text-white">Loading...</div>
+                    </div>
+                </main>
+            </div>
+        )
+    }
 
     if (!study) {
         return (
@@ -78,12 +115,14 @@ export default async function CaseStudyPage({ params }) {
                                                 Client: {study.client}
                                             </span>
                                         </div>
-                                        <Button asChild variant="outline" size="sm">
-                                            <Link href={`/case-studies/${params.id}/edit`}>
-                                                <Edit className="w-4 h-4 mr-2" />
-                                                Edit
-                                            </Link>
-                                        </Button>
+                                        {isAdmin && (
+                                            <Button asChild variant="outline" size="sm">
+                                                <Link href={`/case-studies/${params.id}/edit`}>
+                                                    <Edit className="w-4 h-4 mr-2" />
+                                                    Edit
+                                                </Link>
+                                            </Button>
+                                        )}
                                     </div>
 
                                     <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-white">

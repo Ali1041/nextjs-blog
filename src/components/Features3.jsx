@@ -1,13 +1,27 @@
-import React from 'react';
+"use client"
+
+import React, { useState } from 'react';
+import ContactModal from './ContactModal';
 
 const Features3 = () => {
+    const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
+    const openContactModal = () => {
+        setIsContactModalOpen(true);
+    };
+
+    const closeContactModal = () => {
+        setIsContactModalOpen(false);
+    };
+
     return (
+        <>
         <section className="py-10 py-lg-15">
             <div className="container">
                 <div className="row g-6 gx-lg-14 gx-xl-20 align-center">
                     <div className="col-lg-6" data-aos="fade-up-sm" data-aos-delay="150">
                         <div className="content">
-                            <p className="text-primary-dark">Features 1</p>
+                            {/* <p className="text-primary-dark">Features 1</p> */}
                             <h1 className="text-white mb-8">
                                 Transform Your Business with Our Full-Stack Development Services.
                             </h1>
@@ -59,8 +73,8 @@ const Features3 = () => {
                                     >
                                 </li>
                             </ul>
-                            <a
-                                href="/blog"
+                            <button
+                                onClick={openContactModal}
                                 className="arrow-link arrow-link-primary-dark text-primary-dark gap-3">
                                 <span>Get Started Free</span>
                                 <svg className="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -71,7 +85,7 @@ const Features3 = () => {
                                         strokeLinecap="round"
                                         strokeLinejoin="round" />
                                 </svg>
-                            </a>
+                            </button>
                         </div>
                     </div>
                     <div className="col-lg-6" data-aos="fade-up-sm" data-aos-delay="250">
@@ -86,7 +100,7 @@ const Features3 = () => {
                 <div className="row g-6 gx-lg-14 gx-xl-20 align-center mt-10 flex-row-reverse">
                     <div className="col-lg-6 col-xl-6" data-aos="fade-up-sm" data-aos-delay="150">
                         <div className="content">
-                            <p className="text-primary-dark">Features 2</p>
+                            {/* <p className="text-primary-dark">Features 2</p> */}
                             <h1 className="text-white mb-8">
                                 A Magical Tool To Optimize Your Content For First Page Rankings
                             </h1>
@@ -94,8 +108,8 @@ const Features3 = () => {
                                 Leverage cutting-edge technologies and innovative solutions to stay ahead of the competition.
                                 Our team delivers scalable, secure, and high-performance applications.
                             </p>
-                            <a
-                                href="/blog"
+                            <button
+                                onClick={openContactModal}
                                 className="arrow-link arrow-link-primary-dark text-primary-dark gap-3">
                                 <span>Request A Demo</span>
                                 <svg className="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -106,7 +120,7 @@ const Features3 = () => {
                                         strokeLinecap="round"
                                         strokeLinejoin="round" />
                                 </svg>
-                            </a>
+                            </button>
                         </div>
                     </div>
                     <div className="col-lg-6" data-aos="fade-up-sm" data-aos-delay="250">
@@ -121,7 +135,7 @@ const Features3 = () => {
                 <div className="row g-6 gx-lg-14 gx-xl-20 align-center mt-10">
                     <div className="col-lg-6" data-aos="fade-up-sm" data-aos-delay="150">
                         <div className="content">
-                            <p className="text-primary-dark">Features 3</p>
+                            {/* <p className="text-primary-dark">Features 3</p> */}
                             <h1 className="text-white mb-8">
                                 Build Powerful Software Solutions With
                                 <span className="text-primary-dark">Ijaad Labs</span>.
@@ -174,8 +188,8 @@ const Features3 = () => {
                                     >
                                 </li>
                             </ul>
-                            <a
-                                href="/blog"
+                            <button
+                                onClick={openContactModal}
                                 className="arrow-link arrow-link-primary-dark text-primary-dark gap-3">
                                 <span>Get Started Free</span>
                                 <svg className="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -186,7 +200,7 @@ const Features3 = () => {
                                         strokeLinecap="round"
                                         strokeLinejoin="round" />
                                 </svg>
-                            </a>
+                            </button>
                         </div>
                     </div>
                     <div className="col-lg-6" data-aos="fade-up-sm" data-aos-delay="250">
@@ -200,6 +214,12 @@ const Features3 = () => {
                 </div>
             </div>
         </section>
+        
+        <ContactModal 
+            isOpen={isContactModalOpen} 
+            onClose={closeContactModal} 
+        />
+        </>
     );
 };
 

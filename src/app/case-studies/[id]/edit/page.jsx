@@ -59,7 +59,7 @@ export default function EditCaseStudy() {
                 .eq('id', params.id)
                 .single()
 
-            if (error) {
+            if (error || !study) {
                 console.error("Error fetching case study:", error)
                 router.push("/case-studies")
                 return
@@ -72,7 +72,18 @@ export default function EditCaseStudy() {
             setIndustry(study.industry || "")
             setResults(study.results || "")
             setImage(study.image || "")
-            setTags(study.tags || [])
+            // Ensure tags is always an array
+            let tagsArray = []
+            if (Array.isArray(study.tags)) {
+                tagsArray = study.tags
+            } else if (study.tags) {
+                try {
+                    tagsArray = JSON.parse(study.tags)
+                } catch {
+                    tagsArray = study.tags.split(",").map(tag => tag.replace(/['"\[\]]/g, '').trim()).filter(tag => tag.length > 0)
+                }
+            }
+            setTags(tagsArray)
         } catch (error) {
             console.error("Error fetching case study:", error)
             router.push("/case-studies")
@@ -85,43 +96,57 @@ export default function EditCaseStudy() {
         e.preventDefault()
         setSaving(true)
 
+        console.log('Starting save with data:', { title, content, author, client, industry, results, image, tags })
+
         let imageUrl = image
 
         if (selectedFile) {
             try {
+                console.log('Uploading image:', selectedFile.name)
                 imageUrl = await uploadImage(selectedFile)
+                console.log('Image uploaded successfully:', imageUrl)
             } catch (error) {
                 console.error('Error uploading image:', error)
+                alert('Failed to upload image')
                 setSaving(false)
                 return
             }
         }
 
+        const updateData = {
+            title,
+            content,
+            author,
+            client,
+            industry,
+            results,
+            image: imageUrl,
+            tags
+        }
+
+        console.log('Updating case study with ID:', params.id, 'Data:', updateData)
+
         try {
             const { data, error } = await supabase
                 .from('case_studies')
-                .update({
-                    title,
-                    content,
-                    author,
-                    client,
-                    industry,
-                    results,
-                    image: imageUrl,
-                    tags: tags || []
-                })
+                .update(updateData)
                 .eq('id', params.id)
                 .select()
-                .single()
+
+            console.log('Supabase update response:', { data, error })
 
             if (error) {
                 console.error('Error updating case study:', error)
+                alert('Failed to update case study: ' + error.message)
             } else {
+                console.log('Case study updated successfully!')
+                alert('Case study updated successfully!')
                 router.push(`/case-studies/${params.id}`)
                 router.refresh()
             }
         } catch (error) {
             console.error("Error updating case study:", error)
+            alert('Failed to update case study')
         } finally {
             setSaving(false)
         }

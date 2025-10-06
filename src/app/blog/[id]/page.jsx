@@ -1,3 +1,5 @@
+"use client"
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
@@ -5,28 +7,72 @@ import { ArrowLeft, Calendar, Clock, Tag, Edit } from 'lucide-react'
 import Image from "next/image"
 import Link from "next/link"
 import Navbar from "@/components/Navbar"
-import { notFound } from "next/navigation"
+import { useParams } from "next/navigation"
+import { useState, useEffect } from "react"
+import { getCurrentUser } from "@/lib/auth"
 
-async function getPost(id) {
-    try {
-        const res = await fetch(`http://localhost:3000/api/posts/${id}`, {
-            cache: 'no-store' // Ensure fresh data
-        })
-        if (!res.ok) {
-            return null
-        }
-        return res.json()
-    } catch (error) {
-        console.error('Error fetching post:', error)
-        return null
+export default function BlogPost() {
+    const params = useParams()
+    const [post, setPost] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [isAdmin, setIsAdmin] = useState(false)
+
+    useEffect(() => {
+        fetchPost()
+        checkAdmin()
+    }, [params.id])
+
+    const checkAdmin = async () => {
+        const user = await getCurrentUser()
+        setIsAdmin(!!user)
     }
-}
 
-export default async function BlogPost({ params }) {
-    const post = await getPost(params.id)
+    const fetchPost = async () => {
+        try {
+            const res = await fetch(`/api/posts/${params.id}`, {
+                cache: 'no-store'
+            })
+            if (!res.ok) {
+                setPost(null)
+            } else {
+                const data = await res.json()
+                setPost(data)
+            }
+        } catch (error) {
+            console.error('Error fetching post:', error)
+            setPost(null)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    if (loading) {
+        return (
+            <>
+                <Navbar />
+                <div className="min-h-screen pt-24 pb-12">
+                    <div className="container mx-auto px-4 text-center">
+                        <div className="text-white">Loading...</div>
+                    </div>
+                </div>
+            </>
+        )
+    }
 
     if (!post) {
-        notFound()
+        return (
+            <>
+                <Navbar />
+                <div className="min-h-screen pt-24 pb-12">
+                    <div className="container mx-auto px-4 text-center">
+                        <h1 className="text-4xl font-bold mb-4">Post Not Found</h1>
+                        <Link href="/blog" className="text-primary hover:underline">
+                            ← Back to Blog
+                        </Link>
+                    </div>
+                </div>
+            </>
+        )
     }
 
     // Format date
@@ -69,12 +115,14 @@ export default async function BlogPost({ params }) {
                                                 {formattedDate}
                                             </div>
                                         </div>
-                                        <Button asChild variant="outline" size="sm">
-                                            <Link href={`/blog/${params.id}/edit`}>
-                                                <Edit className="w-4 h-4 mr-2" />
-                                                Edit
-                                            </Link>
-                                        </Button>
+                                        {isAdmin && (
+                                            <Button asChild variant="outline" size="sm">
+                                                <Link href={`/blog/${params.id}/edit`}>
+                                                    <Edit className="w-4 h-4 mr-2" />
+                                                    Edit
+                                                </Link>
+                                            </Button>
+                                        )}
                                     </div>
 
                                     <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">

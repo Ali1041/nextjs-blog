@@ -9,6 +9,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Edit } from 'lucide-react'
 import { getCurrentUser } from "@/lib/auth"
+import ContactModal from "@/components/ContactModal"
 
 export default function CaseStudiesPage() {
     const [caseStudies, setCaseStudies] = useState([])
@@ -16,6 +17,7 @@ export default function CaseStudiesPage() {
     const [currentPage, setCurrentPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [isAdmin, setIsAdmin] = useState(false)
+    const [isContactModalOpen, setIsContactModalOpen] = useState(false)
     const itemsPerPage = 6
 
     useEffect(() => {
@@ -169,15 +171,19 @@ export default function CaseStudiesPage() {
                         <p className="text-gray-400 mb-4">
                             Have a project in mind? Let's discuss how we can help.
                         </p>
-                        <Link
-                            href="/contact"
+                        <button
+                            onClick={() => setIsContactModalOpen(true)}
                             className="inline-block px-6 py-3 bg-gradient-to-r from-[#40e0d0] to-[#7dff8e] text-black font-semibold rounded-lg hover:opacity-90 transition-opacity"
                         >
                             Get in Touch
-                        </Link>
+                        </button>
                     </div>
                 </div>
             </main>
+            <ContactModal 
+                isOpen={isContactModalOpen} 
+                onClose={() => setIsContactModalOpen(false)} 
+            />
         </div>
     )
 }
