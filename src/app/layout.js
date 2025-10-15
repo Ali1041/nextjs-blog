@@ -1,7 +1,8 @@
 import { Inter } from 'next/font/google'
 import "./globals.css"
 import AOSInitializer from '../components/AOSInitializer';
-
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
@@ -137,6 +138,8 @@ export default function RootLayout({
         {children}
         <AOSInitializer />
       </body>
+      <Analytics/>
+      <SpeedInsights/>
     </html>
   );
 }
