@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Edit } from 'lucide-react'
 import { getCurrentUser } from "@/lib/auth"
 import ContactModal from "@/components/ContactModal"
+import { supabase } from "@/lib/db"
 
 export default function CaseStudiesPage() {
     const [caseStudies, setCaseStudies] = useState([])
@@ -19,6 +20,12 @@ export default function CaseStudiesPage() {
     const [isAdmin, setIsAdmin] = useState(false)
     const [isContactModalOpen, setIsContactModalOpen] = useState(false)
     const itemsPerPage = 6
+
+    // Function to strip HTML tags from content
+    const stripHtml = (html) => {
+        if (!html) return ''
+        return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim()
+    }
 
     useEffect(() => {
         fetchCaseStudies()
@@ -34,13 +41,38 @@ export default function CaseStudiesPage() {
     const fetchCaseStudies = async () => {
         setLoading(true)
         try {
-            const response = await fetch(`/api/case-studies?page=${currentPage}&limit=${itemsPerPage}`)
-            if (response.ok) {
-                const data = await response.json()
-                setCaseStudies(data.caseStudies || [])
-                setTotalPages(data.totalPages || 1)
-            } else {
+            const offset = (currentPage - 1) * itemsPerPage
+            const from = offset
+            const to = offset + itemsPerPage - 1
+
+            const { data: caseStudies, error, count } = await supabase
+                .from('case_studies')
+                .select('*', { count: 'exact' })
+                .order('created_at', { ascending: false })
+                .range(from, to)
+
+            if (error) {
+                console.error('Error fetching case studies:', error)
                 setCaseStudies([])
+                setTotalPages(1)
+            } else {
+                // Clean tags
+                caseStudies.forEach(cs => {
+                    if (Array.isArray(cs.tags)) {
+                        cs.tags = cs.tags
+                    } else if (cs.tags) {
+                        try {
+                            cs.tags = JSON.parse(cs.tags)
+                        } catch {
+                            cs.tags = cs.tags.split(",").map(tag => tag.replace(/['"\[\]]/g, '').trim()).filter(tag => tag.length > 0)
+                        }
+                    } else {
+                        cs.tags = []
+                    }
+                })
+                
+                setCaseStudies(caseStudies || [])
+                setTotalPages(Math.ceil(count / itemsPerPage))
             }
         } catch (error) {
             console.error('Error fetching case studies:', error)
@@ -112,7 +144,7 @@ export default function CaseStudiesPage() {
                                 <CardContent className="p-6">
                                     <CardTitle className="mb-3 line-clamp-2">{study.title}</CardTitle>
                                     <CardDescription className="text-gray-400 mb-4 line-clamp-3">
-                                        {study.content ? study.content.replace(/<[^>]*>/g, '') : "No description available."}
+                                        {stripHtml(study.content) || "No description available."}
                                     </CardDescription>
 
                                     <div className="mb-4">

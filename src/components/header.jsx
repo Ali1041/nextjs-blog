@@ -14,9 +14,6 @@ export function Header() {
                         <Link href="https://www.ijaadlabs.com/" className="text-gray-300 hover:text-white transition-colors">
                             Home
                         </Link>
-                        <Link href="/blog" className="text-gray-300 hover:text-white transition-colors">
-                            Blog
-                        </Link>
                     </nav>
                 </div>
             </div>

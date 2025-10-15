@@ -10,6 +10,7 @@ import Navbar from "@/components/Navbar"
 import { useParams } from "next/navigation"
 import { useState, useEffect } from "react"
 import { getCurrentUser } from "@/lib/auth"
+import { supabase } from "@/lib/db"
 
 export default function BlogPost() {
     const params = useParams()
@@ -29,14 +30,30 @@ export default function BlogPost() {
 
     const fetchPost = async () => {
         try {
-            const res = await fetch(`/api/posts/${params.id}`, {
-                cache: 'no-store'
-            })
-            if (!res.ok) {
+            const { data: post, error } = await supabase
+                .from('posts')
+                .select('*')
+                .eq('id', params.id)
+                .single()
+
+            if (error || !post) {
+                console.error('Error fetching post:', error)
                 setPost(null)
             } else {
-                const data = await res.json()
-                setPost(data)
+                // Clean tags
+                if (Array.isArray(post.tags)) {
+                    post.tags = post.tags
+                } else if (post.tags) {
+                    try {
+                        post.tags = JSON.parse(post.tags)
+                    } catch {
+                        post.tags = post.tags.split(",").map(tag => tag.replace(/['"\[\]]/g, '').trim()).filter(tag => tag.length > 0)
+                    }
+                } else {
+                    post.tags = []
+                }
+                
+                setPost(post)
             }
         } catch (error) {
             console.error('Error fetching post:', error)

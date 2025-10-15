@@ -10,6 +10,7 @@ import Navbar from "@/components/Navbar"
 import { useParams } from "next/navigation"
 import { useState, useEffect } from "react"
 import { getCurrentUser } from "@/lib/auth"
+import { supabase } from "@/lib/db"
 
 export default function CaseStudyPage() {
     const params = useParams()
@@ -29,16 +30,31 @@ export default function CaseStudyPage() {
 
     const fetchCaseStudy = async () => {
         try {
-            const res = await fetch(`/api/case-studies/${params.id}`, {
-                cache: 'no-store'
-            })
-            if (!res.ok) {
-                console.error('API response not ok:', res.status, res.statusText)
+            const { data: caseStudy, error } = await supabase
+                .from('case_studies')
+                .select('*')
+                .eq('id', params.id)
+                .single()
+
+            if (error || !caseStudy) {
+                console.error('Error fetching case study:', error)
                 setStudy(null)
             } else {
-                const data = await res.json()
-                console.log('Case study data received:', data)
-                setStudy(data)
+                // Clean tags
+                if (Array.isArray(caseStudy.tags)) {
+                    caseStudy.tags = caseStudy.tags
+                } else if (caseStudy.tags) {
+                    try {
+                        caseStudy.tags = JSON.parse(caseStudy.tags)
+                    } catch {
+                        caseStudy.tags = caseStudy.tags.split(",").map(tag => tag.replace(/['"\[\]]/g, '').trim()).filter(tag => tag.length > 0)
+                    }
+                } else {
+                    caseStudy.tags = []
+                }
+                
+                console.log('Case study data received:', caseStudy)
+                setStudy(caseStudy)
             }
         } catch (error) {
             console.error('Error fetching case study:', error)

@@ -9,6 +9,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Edit } from 'lucide-react'
 import { getCurrentUser } from "@/lib/auth"
+import { supabase } from "@/lib/db"
 
 export default function BlogPage() {
   const [posts, setPosts] = useState([])
@@ -17,6 +18,12 @@ export default function BlogPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [isAdmin, setIsAdmin] = useState(false)
   const itemsPerPage = 6
+
+  // Function to strip HTML tags from content
+  const stripHtml = (html) => {
+    if (!html) return ''
+    return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim()
+  }
 
   useEffect(() => {
     fetchPosts()
@@ -32,13 +39,38 @@ export default function BlogPage() {
   const fetchPosts = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/posts?page=${currentPage}&limit=${itemsPerPage}`)
-      if (response.ok) {
-        const data = await response.json()
-        setPosts(data.posts || [])
-        setTotalPages(data.totalPages || 1)
-      } else {
+      const offset = (currentPage - 1) * itemsPerPage
+      const from = offset
+      const to = offset + itemsPerPage - 1
+
+      const { data: posts, error, count } = await supabase
+        .from('posts')
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(from, to)
+
+      if (error) {
+        console.error('Error fetching posts:', error)
         setPosts([])
+        setTotalPages(1)
+      } else {
+        // Clean tags
+        posts.forEach(post => {
+          if (Array.isArray(post.tags)) {
+            post.tags = post.tags
+          } else if (post.tags) {
+            try {
+              post.tags = JSON.parse(post.tags)
+            } catch {
+              post.tags = post.tags.split(",").map(tag => tag.replace(/['"\[\]]/g, '').trim()).filter(tag => tag.length > 0)
+            }
+          } else {
+            post.tags = []
+          }
+        })
+        
+        setPosts(posts || [])
+        setTotalPages(Math.ceil(count / itemsPerPage))
       }
     } catch (error) {
       console.error('Error fetching posts:', error)
@@ -105,7 +137,7 @@ export default function BlogPage() {
                   <CardContent className="p-6">
                     <CardTitle className="mb-2 line-clamp-2 no-underline">{post.title}</CardTitle>
                     <CardDescription className="text-gray-400 line-clamp-2">
-                      {post.content.substring(0, 100)}...
+                      {stripHtml(post.content).substring(0, 100)}...
                     </CardDescription>
                     <div className="flex flex-wrap gap-2 mt-4">
                       {(Array.isArray(post.tags) ? post.tags : post.tags ? post.tags.split(",") : []).map((tag, index) => (

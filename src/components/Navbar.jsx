@@ -129,13 +129,6 @@ const Navbar = () => {
                                 FAQ
                             </button>
                             <Link
-                                href="/blog"
-                                className="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-all duration-200 no-underline"
-                                style={{ textDecoration: 'none' }}
-                            >
-                                Blog
-                            </Link>
-                            <Link
                                 href="/case-studies"
                                 className="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-all duration-200 no-underline"
                                 style={{ textDecoration: 'none' }}
@@ -213,14 +206,6 @@ const Navbar = () => {
                         >
                             FAQ
                         </button>
-                        <a
-                            href="/blog"
-                            className="text-gray-300 hover:text-yellow-400 block px-3 py-2 text-base font-medium transition-all duration-200 no-underline"
-                            style={{ textDecoration: 'none' }}
-                            onClick={() => setIsMenuOpen(false)}
-                        >
-                            Blog
-                        </a>
                         <a
                             href="/case-studies"
                             className="text-gray-300 hover:text-yellow-400 block px-3 py-2 text-base font-medium transition-all duration-200 no-underline"
